@@ -11,6 +11,10 @@ if (started) {
   app.quit();
 }
 
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('ozone-platform', 'x11');
+}
+
 protocol.registerSchemesAsPrivileged([
   {
     scheme: "media",
