@@ -116,16 +116,17 @@ app.on('window-all-closed', () => {
 
 ipcMain.handle("get-videos", () => {
   const videoDir = path.join(app.getAppPath(), "video");
-  const files = fs.readdirSync(videoDir);
-
-  return files.map(file => path.join(videoDir, file));
-})
+  return fs.readdirSync(videoDir); // Returns ['clip1.mp4', 'clip2.mp4', ...]
+});
 
 app.whenReady().then(() => {
   protocol.handle("media", (request) => {
-      const filename = decodeURIComponent(new URL(request.url).pathname);
+    const url = new URL(request.url);
+    // Decode the filename (hostname + pathname handles media://filename or media:///filename)
+    const rawName = decodeURIComponent(url.hostname ? url.hostname + url.pathname : url.pathname.slice(1));
+    const safeName = path.basename(rawName);
+    const filePath = path.join(app.getAppPath(), "video", safeName);
 
-      console.log(pathToFileURL(filename).href)
-      return net.fetch(pathToFileURL(filename).href);
-  })
-})
+    return net.fetch(pathToFileURL(filePath).href);
+  });
+});
