@@ -13,28 +13,20 @@
  */
 
 import './index.css';
-import { setItemCount } from './spawner'; // set from to the file you're making :D
 
 const IPM_PER_ITEM = 100; // placeholder, tune while testing
 const MAX_ITEMS = 100; // safety cap
 
 let current = 0;
 
-window.input.onIpm((ipm) => {
-  console.log(ipm); // log
-
-  const target = Math.min(Math.floor(ipm / IPM_PER_ITEM), MAX_ITEMS);
-  if (target !== current) {
-    current = target;
-    setItemCount(target); // only called when the number changes
-  }
-});
-
 const container = document.getElementById("container");
 
 const randomRange = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
+// @ts-ignore
 const videos: string[] = await window.api.getVideos();
+
+const openVideos: HTMLVideoElement[] = [];
 
 const spawn = () => {
     const video = document.createElement("video");
@@ -44,6 +36,8 @@ const spawn = () => {
     video.autoplay = true;
     video.loop = true;
     video.src = `media://videos/${encodeURIComponent(videos[randomRange(0, videos.length - 1)])}`;
+
+    openVideos.push(video);
 
     switch (randomRange(0, 3)) {
         case 0: //top
@@ -66,4 +60,25 @@ const spawn = () => {
 
     container?.appendChild(video);
 }
-setInterval(spawn, 1000);
+
+window.input.onIpm((ipm) => {
+    console.log(ipm); // log
+
+    const target = Math.min(Math.floor(ipm / IPM_PER_ITEM), MAX_ITEMS);
+    if (target !== current) {
+        current = target;
+
+        if (openVideos.length < current) {
+            for (let i = 0; i < current - openVideos.length; i++) {
+                spawn();
+            }
+        } else {
+            for (let i = 0; i < openVideos.length - current; i++) {
+                let vid = openVideos.pop();
+                if (vid) {
+                    container?.removeChild(vid);
+                }
+            }
+        }
+    }
+});

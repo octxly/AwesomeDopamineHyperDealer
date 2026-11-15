@@ -11,7 +11,6 @@ contextBridge.exposeInMainWorld('input', {
   onIpm: (cb: (ipm: number) => void) =>
     ipcRenderer.on('ipm', (_evt, ipm) => cb(ipm)),
 });
-import {contextBridge, ipcRenderer} from "electron";
 
 contextBridge.exposeInMainWorld("api", {
     getVideos: () => ipcRenderer.invoke("get-videos")
