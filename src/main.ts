@@ -80,7 +80,7 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
-  const WINDOW_MS = 10_000; // count the last 10s
+  const WINDOW_MS = 2000; // count the last 2s
   const hits: number[] = []; // timestamps of inputs
 
   uIOhook.on('keydown', () => hits.push(Date.now()));
@@ -89,13 +89,13 @@ app.whenReady().then(() => {
   setInterval(() => {
     const now = Date.now();
     while (hits.length && now - hits[0] > WINDOW_MS) hits.shift(); // drop old
-    const ipm = hits.length * 6; // 10 s * 6 per minute
+    const ipm = hits.length * 30; // 2 s * 30 per minute
 
     // Send to every open window
     for (const w of BrowserWindow.getAllWindows()) {
       w.webContents.send('ipm', ipm);
     }
-  }, 1000);
+  }, 250);
   
   uIOhook.start(); // begin listening
 });

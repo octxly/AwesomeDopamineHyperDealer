@@ -15,7 +15,7 @@
 import './index.css';
 
 const IPM_PER_ITEM = 100; // placeholder, tune while testing
-const MAX_ITEMS = 100; // safety cap
+const MAX_ITEMS = 10; // safety cap
 
 let current = 0;
 
@@ -42,19 +42,19 @@ const spawn = () => {
     switch (randomRange(0, 3)) {
         case 0: //top
             video.style.top = "0";
-            video.style.left = randomRange(0, 100) + "%";
+            video.style.left = randomRange(0, 85) + "%";
             break;
         case 1: //left
             video.style.left = "0";
-            video.style.top = randomRange(0, 100) + "%";
+            video.style.top = randomRange(0, 85) + "%";
             break;
         case 2: //bottom
             video.style.bottom = "0";
-            video.style.left = randomRange(0, 100) + "%";
+            video.style.left = randomRange(0, 85) + "%";
             break;
         case 3: //right
             video.style.right = "0";
-            video.style.top = randomRange(0, 100) + "%";
+            video.style.top = randomRange(0, 85) + "%";
             break;
     }
 
@@ -62,8 +62,6 @@ const spawn = () => {
 }
 
 window.input.onIpm((ipm) => {
-    console.log(ipm); // log
-
     const target = Math.min(Math.floor(ipm / IPM_PER_ITEM), MAX_ITEMS);
     if (target !== current) {
         current = target;
