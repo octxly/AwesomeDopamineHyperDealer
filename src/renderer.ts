@@ -35,7 +35,7 @@ const spawn = () => {
     video.controls = false;
     video.autoplay = true;
     video.loop = true;
-    video.src = `media://videos/${encodeURIComponent(videos[randomRange(0, videos.length - 1)])}`;
+    video.src = `media://${encodeURIComponent(videos[randomRange(0, videos.length - 1)])}`;
 
     openVideos.push(video);
 
