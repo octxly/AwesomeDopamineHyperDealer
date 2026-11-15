@@ -14,10 +14,8 @@
 
 import './index.css';
 
-const IPM_PER_ITEM = 100; // placeholder, tune while testing
-const MAX_ITEMS = 10; // safety cap
-
-let current = 0;
+const SCORE_PER_ITEM = 100; // placeholder, tune while testing
+const MAX_ITEMS = 30; // safety cap
 
 const container = document.getElementById("container");
 
@@ -31,7 +29,7 @@ const openVideos: HTMLVideoElement[] = [];
 const spawn = () => {
     const video = document.createElement("video");
     video.className = "absolute";
-    video.style.width = `${randomRange(100, 500)}px`;
+    // video.style.width = `${randomRange(100, 350)}px`;
     video.controls = false;
     video.autoplay = true;
     video.loop = true;
@@ -41,20 +39,24 @@ const spawn = () => {
 
     switch (randomRange(0, 3)) {
         case 0: //top
+            video.style.height = `${randomRange(100, 350)}px`;
             video.style.top = "0";
             video.style.left = randomRange(0, 85) + "%";
             break;
         case 1: //left
             video.style.left = "0";
             video.style.top = randomRange(0, 85) + "%";
+            video.style.width = `${randomRange(100, 350)}px`;
             break;
         case 2: //bottom
+            video.style.height = `${randomRange(100, 350)}px`;
             video.style.bottom = "0";
             video.style.left = randomRange(0, 85) + "%";
             break;
         case 3: //right
             video.style.right = "0";
             video.style.top = randomRange(0, 85) + "%";
+            video.style.width = `${randomRange(100, 350)}px`;
             break;
     }
 
@@ -62,20 +64,16 @@ const spawn = () => {
 }
 
 window.input.onIpm((ipm) => {
-    const target = Math.min(Math.floor(ipm / IPM_PER_ITEM), MAX_ITEMS);
-    if (target !== current) {
-        current = target;
-
-        if (openVideos.length < current) {
-            for (let i = 0; i < current - openVideos.length; i++) {
-                spawn();
-            }
-        } else {
-            for (let i = 0; i < openVideos.length - current; i++) {
-                let vid = openVideos.pop();
-                if (vid) {
-                    container?.removeChild(vid);
-                }
+    const target = Math.min(Math.floor(ipm / SCORE_PER_ITEM), MAX_ITEMS);
+    if (openVideos.length < target) {
+        for (let i = 0; i < target - openVideos.length; i++) {
+            spawn();
+        }
+    } else if (openVideos.length > target) {
+        for (let i = 0; i < openVideos.length - target; i++) {
+            let vid = openVideos.pop();
+            if (vid) {
+                container?.removeChild(vid);
             }
         }
     }

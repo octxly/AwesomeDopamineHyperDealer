@@ -80,22 +80,34 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
-  const WINDOW_MS = 2000; // count the last 2s
-  const hits: number[] = []; // timestamps of inputs
+  // const WINDOW_MS = 2000; // count the last 2s
+  // const hits: [number, number][] = []; // timestamps of inputs
+  let score = 0;
+  let lastEvent = Date.now();
 
-  uIOhook.on('keydown', () => hits.push(Date.now()));
-  uIOhook.on('mousedown', () => hits.push(Date.now()));
+  uIOhook.on('keydown', (e) => {
+    score += 25;
+    lastEvent = Date.now();
+  });
+  uIOhook.on('mousedown', (e) => {
+    score += 5;
+    lastEvent = Date.now();
+  });
 
   setInterval(() => {
-    const now = Date.now();
-    while (hits.length && now - hits[0] > WINDOW_MS) hits.shift(); // drop old
-    const ipm = hits.length * 30; // 2 s * 30 per minute
+    // const now = Date.now();
+    // while (hits.length && now - hits[0][0] > WINDOW_MS) hits.shift(); // drop old
+    // const ipm = hits[0] * 30; // 2 s * 30 per minute
+
+    if (lastEvent + 2000 < Date.now()) {
+      score *= 0.5;
+    }
 
     // Send to every open window
     for (const w of BrowserWindow.getAllWindows()) {
-      w.webContents.send('ipm', ipm);
+      w.webContents.send('ipm', score);
     }
-  }, 250);
+  }, 100);
   
   uIOhook.start(); // begin listening
 });
