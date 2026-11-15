@@ -15,9 +15,10 @@
 import './index.css';
 
 const SCORE_PER_ITEM = 100; // placeholder, tune while testing
-const MAX_ITEMS = 30; // safety cap
+const MAX_ITEMS = 20; // safety cap
 
 const container = document.getElementById("container");
+const progress = document.getElementById("progress");
 
 const randomRange = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -29,10 +30,10 @@ const openVideos: HTMLVideoElement[] = [];
 const spawn = () => {
     const video = document.createElement("video");
     video.className = "absolute";
-    // video.style.width = `${randomRange(100, 350)}px`;
     video.controls = false;
     video.autoplay = true;
     video.loop = true;
+    video.style.zIndex = "0";
     video.src = `media://${encodeURIComponent(videos[randomRange(0, videos.length - 1)])}`;
 
     openVideos.push(video);
@@ -64,7 +65,10 @@ const spawn = () => {
 }
 
 window.input.onIpm((ipm) => {
+    
+    
     const target = Math.min(Math.floor(ipm / SCORE_PER_ITEM), MAX_ITEMS);
+    progress.value = ipm.toString();
     if (openVideos.length < target) {
         for (let i = 0; i < target - openVideos.length; i++) {
             spawn();
