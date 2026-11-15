@@ -1,12 +1,25 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, protocol, net } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import {screen} from "electron";
 import * as fs from "node:fs";
+import {pathToFileURL} from "url";
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "media",
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      stream: true
+    }
+  }
+])
 
 const createWindow = () => {
   // const {width, height} = screen.getPrimaryDisplay().workAreaSize;
@@ -19,7 +32,8 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       // nodeIntegration: true,
-      // contextIsolation: false
+      // contextIsolation: false,
+      // webSecurity: false
     },
     focusable: false,
     resizable: false,
@@ -29,7 +43,7 @@ const createWindow = () => {
   mainWindow.setBounds(screen.getPrimaryDisplay().bounds);
 
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-  // mainWindow.setIgnoreMouseEvents(true, {forward: true});
+  mainWindow.setIgnoreMouseEvents(true, {forward: true});
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -45,7 +59,7 @@ const createWindow = () => {
   })
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -80,4 +94,13 @@ ipcMain.handle("get-videos", () => {
   const files = fs.readdirSync(videoDir);
 
   return files.map(file => path.join(videoDir, file));
+})
+
+app.whenReady().then(() => {
+  protocol.handle("media", (request) => {
+      const filename = decodeURIComponent(new URL(request.url).pathname);
+
+      console.log(pathToFileURL(filename).href)
+      return net.fetch(pathToFileURL(filename).href);
+  })
 })

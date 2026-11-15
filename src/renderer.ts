@@ -13,7 +13,6 @@
  */
 
 import './index.css';
-import {pathToFileURL} from "url";
 
 const container = document.getElementById("container");
 
@@ -24,18 +23,11 @@ const videos: string[] = await window.api.getVideos();
 const spawn = () => {
     const video = document.createElement("video");
     video.className = "absolute";
+    video.style.width = `${randomRange(100, 500)}px`;
     video.controls = false;
     video.autoplay = true;
     video.loop = true;
-    video.src = pathToFileURL(videos[randomRange(0, videos.length - 1)]).href;
-
-    // const source = document.createElement("source");
-    // source.src = videos[randomRange(0, videos.length - 1)];
-    // source.type = "video/mp4";
-    //
-    // video.appendChild(source);
-
-    console.log(video.src);
+    video.src = `media://videos/${encodeURIComponent(videos[randomRange(0, videos.length - 1)])}`;
 
     switch (randomRange(0, 3)) {
         case 0: //top
