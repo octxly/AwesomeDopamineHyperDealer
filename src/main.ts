@@ -1,12 +1,18 @@
 import { app, BrowserWindow, ipcMain, protocol, net } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import { uIOhook } from 'uiohook-napi';
+
 import {screen} from "electron";
 import * as fs from "node:fs";
 import {pathToFileURL} from "url";
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
+}
+
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('ozone-platform', 'x11');
 }
 
 protocol.registerSchemesAsPrivileged([
@@ -71,11 +77,30 @@ app.whenReady().then(() => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+
+  const WINDOW_MS = 10_000; // count the last 10s
+  const hits: number[] = []; // timestamps of inputs
+
+  uIOhook.on('keydown', () => hits.push(Date.now()));
+  uIOhook.on('mousedown', () => hits.push(Date.now()));
+
+  setInterval(() => {
+    const now = Date.now();
+    while (hits.length && now - hits[0] > WINDOW_MS) hits.shift(); // drop old
+    const ipm = hits.length * 6; // 10 s * 6 per minute
+
+    // Send to every open window
+    for (const w of BrowserWindow.getAllWindows()) {
+      w.webContents.send('ipm', ipm);
+    }
+  }, 1000);
+  
+  uIOhook.start(); // begin listening
 });
+
+app.on('will-quit', () => uIOhook.stop()); // stop OS hook before exit
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -91,16 +116,17 @@ app.on('window-all-closed', () => {
 
 ipcMain.handle("get-videos", () => {
   const videoDir = path.join(app.getAppPath(), "video");
-  const files = fs.readdirSync(videoDir);
-
-  return files.map(file => path.join(videoDir, file));
-})
+  return fs.readdirSync(videoDir); // Returns ['clip1.mp4', 'clip2.mp4', ...]
+});
 
 app.whenReady().then(() => {
   protocol.handle("media", (request) => {
-      const filename = decodeURIComponent(new URL(request.url).pathname);
+    const url = new URL(request.url);
+    // Decode the filename (hostname + pathname handles media://filename or media:///filename)
+    const rawName = decodeURIComponent(url.hostname ? url.hostname + url.pathname : url.pathname.slice(1));
+    const safeName = path.basename(rawName);
+    const filePath = path.join(app.getAppPath(), "video", safeName);
 
-      console.log(pathToFileURL(filename).href)
-      return net.fetch(pathToFileURL(filename).href);
-  })
-})
+    return net.fetch(pathToFileURL(filePath).href);
+  });
+});
