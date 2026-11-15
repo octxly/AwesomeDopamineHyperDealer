@@ -13,6 +13,22 @@
  */
 
 import './index.css';
+import { setItemCount } from './spawner'; // set from to the file you're making :D
+
+const IPM_PER_ITEM = 100; // placeholder, tune while testing
+const MAX_ITEMS = 100; // safety cap
+
+let current = 0;
+
+window.input.onIpm((ipm) => {
+  console.log(ipm); // log
+
+  const target = Math.min(Math.floor(ipm / IPM_PER_ITEM), MAX_ITEMS);
+  if (target !== current) {
+    current = target;
+    setItemCount(target); // only called when the number changes
+  }
+});
 
 const container = document.getElementById("container");
 
