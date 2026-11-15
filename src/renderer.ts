@@ -30,6 +30,40 @@ window.input.onIpm((ipm) => {
   }
 });
 
-console.log(
-  '👋 This message is being logged by the renderer process, included via Vite',
-);
+const container = document.getElementById("container");
+
+const randomRange = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
+
+const videos: string[] = await window.api.getVideos();
+
+const spawn = () => {
+    const video = document.createElement("video");
+    video.className = "absolute";
+    video.style.width = `${randomRange(100, 500)}px`;
+    video.controls = false;
+    video.autoplay = true;
+    video.loop = true;
+    video.src = `media://videos/${encodeURIComponent(videos[randomRange(0, videos.length - 1)])}`;
+
+    switch (randomRange(0, 3)) {
+        case 0: //top
+            video.style.top = "0";
+            video.style.left = randomRange(0, 100) + "%";
+            break;
+        case 1: //left
+            video.style.left = "0";
+            video.style.top = randomRange(0, 100) + "%";
+            break;
+        case 2: //bottom
+            video.style.bottom = "0";
+            video.style.left = randomRange(0, 100) + "%";
+            break;
+        case 3: //right
+            video.style.right = "0";
+            video.style.top = randomRange(0, 100) + "%";
+            break;
+    }
+
+    container?.appendChild(video);
+}
+setInterval(spawn, 1000);
