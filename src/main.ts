@@ -1,21 +1,35 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
-
+import {screen} from "electron";
+import * as fs from "node:fs";
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
 const createWindow = () => {
+  // const {width, height} = screen.getPrimaryDisplay().workAreaSize;
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
+      // nodeIntegration: true,
+      // contextIsolation: false
     },
+    focusable: false,
+    resizable: false,
+    fullscreen: true,
   });
+
+  mainWindow.setBounds(screen.getPrimaryDisplay().bounds);
+
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  // mainWindow.setIgnoreMouseEvents(true, {forward: true});
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -25,6 +39,10 @@ const createWindow = () => {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
+
+  mainWindow.webContents.on("console-message", ev => {
+    console.log("[renderer]", ev.message);
+  })
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -56,3 +74,10 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+ipcMain.handle("get-videos", () => {
+  const videoDir = path.join(app.getAppPath(), "video");
+  const files = fs.readdirSync(videoDir);
+
+  return files.map(file => path.join(videoDir, file));
+})
