@@ -15,7 +15,7 @@
 import './index.css';
 
 const SCORE_PER_ITEM = 100; // placeholder, tune while testing
-const MAX_ITEMS = 20; // safety cap
+const MAX_ITEMS = 25; // safety cap
 
 const container = document.getElementById("container");
 const progress = document.getElementById("progress");

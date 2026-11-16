@@ -86,11 +86,11 @@ app.whenReady().then(() => {
   let lastEvent = Date.now();
 
   uIOhook.on('keydown', (e) => {
-    score += 25;
+    score += 50;
     lastEvent = Date.now();
   });
   uIOhook.on('mousedown', (e) => {
-    score += 25;
+    score += 50;
     lastEvent = Date.now();
   });
 
@@ -100,7 +100,7 @@ app.whenReady().then(() => {
     // const ipm = hits[0] * 30; // 2 s * 30 per minute
 
     if (lastEvent + 2000 < Date.now()) {
-      score *= 0.75;
+      score *= 0.95;
     }
 
     // Send to every open window
