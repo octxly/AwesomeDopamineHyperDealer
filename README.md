@@ -5,20 +5,21 @@ Every university student experienced this: an assignment due by midnight, but ye
 A.D.H.D is an easy-to-use program which tracks your keyboard and mouse inputs, putting more brainrots on your screen as you work more. It also removes the brainrots when it detects that you've stopped working, creating the perfect environment which encourages spammi-- I mean productivity.
 
 ## How we built it
-Frontend: built with electron and HTML to display videos and the status bar
-Backend: built with electron and typescript to keep track of user inputs
-Videos: a mix of all-originally filmed and downloaded off the internet
+- Frontend: built with electron and HTML to display videos and the status bar
+- Backend: built with electron and typescript to keep track of user inputs
+- Videos: a mix of all-originally filmed and downloaded off the internet
 
 ## Challenges we ran into
-Video Duplication: while many measures were put in place to get rid of duplicates, somehow some duplicates still appeared
-Learning Electron: the whole team was new to Electron, so time was needed to quickly learn the new software to ensure smooth production
+- Video Duplication: while many measures were put in place to get rid of duplicates, somehow some duplicates still appeared
+- Learning Electron: the whole team was new to Electron, so time was needed to quickly learn the new software to ensure smooth production
 
 ## Accomplishments that we're proud of
-Reliable Video Showing: videos shows up consistently at in a smooth manner
-Electron: learning the new software within 7 hours to create this project
+- Reliable Video Showing: videos shows up consistently at in a smooth manner
+- Electron: learning the new software within 7 hours to create this project
 
 ## What we learned
-Fullstack Development 
+- Fullstack Development
+
 ## What's next for Assignment Dopamine Hyper Dealer
-More Videos: more More MORE videos!
-Progress Bar: some effects like cam shake and perhaps something that happens when it's full!
+- More Videos: more More MORE videos!
+- Progress Bar: some effects like cam shake and perhaps something that happens when it's full!
